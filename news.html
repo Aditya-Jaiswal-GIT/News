@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News App</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f2f2f2;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.container {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    width: 800px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+}
+
+h2 {
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.search-box {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.search-box input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #444;
+}
+
+.search-box button {
+    padding: 10px 15px;
+    border: none;
+    background: #007BFF;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.news-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.news-card {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    display: flex;
+    gap: 20px;
+    border: 1px solid #ddd;
+}
+
+.news-card img {
+    width: 200px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.news-content h3 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.news-content p {
+    margin-bottom: 10px;
+    color: #555;
+}
+
+.news-content a {
+    color: #007BFF;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.news-content a:hover {
+    text-decoration: underline;
+}
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>News App</h2>
+
+        <div class="search-box">
+            <input type="text" id="topicInput" placeholder="Enter topic (e.g., Tesla, India, AI)">
+            <button onclick="getNews()">Search</button>
+        </div>
+
+        <div id="newsContainer" class="news-list"></div>
+    </div>
+
+<script >async function getNews() {
+    const topic = document.getElementById("topicInput").value;
+
+    if (topic.trim() === "") {
+        alert("Please enter a topic");
+        return;
+    }
+
+    const apiKey = "bfd197f8a3814568accbceba37bdc304";
+    const url = `https://newsapi.org/v2/everything?q=${topic}&sortBy=publishedAt&apiKey=${apiKey}`;
+
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.articles.length === 0) {
+            document.getElementById("newsContainer").innerHTML =
+                "<p>No news found for this topic.</p>";
+            return;
+        }
+
+        let newsHTML = "";
+
+        data.articles.forEach(article => {
+            newsHTML += `
+                <div class="news-card">
+                    <img src="${article.urlToImage || 'https://via.placeholder.com/200'}" alt="News Image">
+
+                    <div class="news-content">
+                        <h3>${article.title}</h3>
+                        <p>${article.description || "No description available."}</p>
+                        <p><strong>Source:</strong> ${article.source.name}</p>
+                        <p><strong>Published:</strong> ${new Date(article.publishedAt).toLocaleString()}</p>
+                        <a href="${article.url}" target="_blank">Read More</a>
+                    </div>
+                </div>
+            `;
+        });
+
+        document.getElementById("newsContainer").innerHTML = newsHTML;
+
+    } catch (error) {
+        alert("Error fetching news!");
+        console.log(error);
+    }
+}
+</script>
+</body>
+</html>
